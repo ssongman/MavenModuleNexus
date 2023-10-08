@@ -17,9 +17,11 @@ Nexus를 활용한 Maven Module
 
 ## 1) Nexus 설치
 
-http://nexus.ssongman.duckdns.org/#admin/security/users
+설치스크립트 생략
 
 
+
+nexus 링크 : http://nexus.ssongman.duckdns.org/#admin/security/users
 
 
 
@@ -180,14 +182,31 @@ $ mvn -Drevision=0.1.4 -DskipTests clean compile deploy
 $ mvn -Drevision=0.1.5 -DskipTests clean compile deploy
 
 
-
-mvn -Drevision=0.1.5.0 -DskipTests clean compile deploy
-mvn -Drevision=0.1.5.9 -DskipTests clean compile deploy
+mvn -Drevision=0.1.5.0  -DskipTests clean compile deploy
+mvn -Drevision=0.1.5.9  -DskipTests clean compile deploy
 mvn -Drevision=0.1.5.10 -DskipTests clean compile deploy
 mvn -Drevision=0.1.5.11 -DskipTests clean compile deploy
 mvn -Drevision=0.1.5.12 -DskipTests clean compile deploy
+mvn -Drevision=0.1.5.13 -DskipTests clean compile deploy
+mvn -Drevision=0.1.5.14 -DskipTests clean compile deploy
 
+mvn -Drevision=0.1.6.0 -DskipTests clean compile deploy
+mvn -Drevision=0.1.6.1 -DskipTests clean compile deploy
+mvn -Drevision=0.1.6.3 -DskipTests clean compile deploy
+mvn -Drevision=0.1.6.4 -DskipTests clean compile deploy
+mvn -Drevision=0.1.6.5 -DskipTests clean compile deploy
 
+mvn -Drevision=0.1.5.15 -DskipTests clean compile deploy
+
+# 순서를 거꾸로 해보자.
+mvn -Drevision=0.1.6.7 -DskipTests clean compile deploy
+mvn -Drevision=0.1.6.6 -DskipTests clean compile deploy
+
+# 역시 0.1.6.7 이 max 값으로 잘 인식한다.
+
+# 이제는 특정값으로
+mvn -Drevision=0.1.6.7-Beta1 -DskipTests clean compile deploy
+mvn -Drevision=0.1.6.8 -DskipTests clean compile deploy
 
 
 
@@ -257,6 +276,15 @@ $ mvn -Drevision=0.1.1 clean package
 
 ## 2) 실행
 
+#### 실행
+
+```sh
+$ curl localhost:8081/api/health
+
+$ curl localhost:8081/api/planes
+
+```
+
 
 
 
@@ -269,18 +297,18 @@ $ mvn -Drevision=0.1.1 clean package
 
 RequireMavenVersion 및 RequireJavaVersion 규칙은 사용 편의성을 위해 한 가지 사소한 변경 사항이 포함된 표준 Maven 버전 범위 구문을 사용합니다(*로 표시).
 
-| Range         | Meaning                                                      |
-| ------------- | ------------------------------------------------------------ |
-| 1.0           | x >= 1.0 * The default Maven meaning for 1.0 is everything (,) but with 1.0 recommended. Obviously this doesn't work for enforcing versions here, so it has been redefined as a minimum version. |
-| (,1.0]        | x <= 1.0                                                     |
-| (,1.0)        | x < 1.0                                                      |
-| [1.0]         | x == 1.0                                                     |
-| [1.0,)        | x >= 1.0                                                     |
-| (1.0,)        | x > 1.0                                                      |
-| (1.0,2.0)     | 1.0 < x < 2.0                                                |
-| [1.0,2.0]     | 1.0 <= x <= 2.0                                              |
-| (,1.0],[1.2,) | x <= 1.0 or x >= 1.2. Multiple sets are comma-separated      |
-| (,1.1),(1.1,) | x != 1.1                                                     |
+| Range         | Meaning                                                 |
+| ------------- | ------------------------------------------------------- |
+| 1.0           | x >= 1.0 *                                              |
+| (,1.0]        | x <= 1.0                                                |
+| (,1.0)        | x < 1.0                                                 |
+| [1.0]         | x == 1.0                                                |
+| [1.0,)        | x >= 1.0                                                |
+| (1.0,)        | x > 1.0                                                 |
+| (1.0,2.0)     | 1.0 < x < 2.0                                           |
+| [1.0,2.0]     | 1.0 <= x <= 2.0                                         |
+| (,1.0],[1.2,) | x <= 1.0 or x >= 1.2. Multiple sets are comma-separated |
+| (,1.1),(1.1,) | x != 1.1                                                |
 
 
 
@@ -307,11 +335,91 @@ RequireMavenVersion 및 RequireJavaVersion 규칙은 사용 편의성을 위해 
 
 
 
+### (2) 최신버젼 작동원리
+
+range 내에서 최신버젼 셋팅은 아래 metadata 파일을 가져온 이후 
+
+maven-metadata.xml
+
+```xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>com.ssongman.airport</groupId>
+  <artifactId>airport-core</artifactId>
+  <versioning>
+    <latest>0.1.3</latest>
+    <release>0.1.6.8</release>
+    <versions>
+      <version>0.0.6</version>
+      <version>0.0.7</version>
+      <version>0.0.9</version>
+      <version>0.0.10</version>
+      <version>0.0.11</version>
+      <version>0.1.0</version>
+      <version>0.1.2</version>
+      <version>0.1.3</version>
+      <version>0.1.4</version>
+      <version>0.1.5</version>
+      <version>0.1.5.0</version>
+      <version>0.1.5.9</version>
+      <version>0.1.5.10</version>
+      <version>0.1.5.11</version>
+      <version>0.1.5.13</version>
+      <version>0.1.5.14</version>
+      <version>0.1.6.0</version>
+      <version>0.1.6.1</version>
+      <version>0.1.6.3</version>
+      <version>0.1.6.4</version>
+      <version>0.1.6.5</version>
+      <version>0.1.5.15</version>
+      <version>0.1.6.7</version>
+      <version>0.1.6.6</version>
+      <version>0.1.6.7-Beta1</version>
+      <version>0.1.6.8</version>
+    </versions>
+    <lastUpdated>20231008144407</lastUpdated>
+  </versioning>
+</metadata>
+```
+
+
+
+
+
+
+
+
+
 ### (2) 최신버젼 적용
 
-최신버전을 가져오기 위해서는 maven update 가 되어야 한다.
+module(library) 이 최신버젼으로 release 되어 nexus 에 upload 되었다.
 
-실제로 "update maven project"  메뉴 실행으로 최신화 되었다.
+* airport-core 버젼업
+  * 0.1.6.0  -->  0.1.6.1 upload
+
+
+
+하지만 Local PC 에서의 소스에서는 아무런 이벤트 없이 해당 모듈의 최신  버젼을 자동으로 가져오지는 않는다. 
+
+* Maven Dependencies 확인
+  * airport-core-0.1.6.0.jar 파일로 유지 됨.
+
+
+
+아래와 같이 특정 이벤트가 있어야지만 반영이 된다.
+
+* STS Update Maven Project (Alt + F5)
+* pom.xml 파일 수정
+* STS 재기동시 새롭게 반영됨
+
+
+
+CICD 자동화 스크립트시 간헐적으로 최신버젼을 가져오지 못하는 현상이 있어서 강제로 update 하는 부분이 있어야 한다.
+
+
+
+eclipse 를 재기동 하지 않고 최신버젼을 가져올 수 있는 CLI 명령을 찾아보자.
 
 ```sh
 mvn clean -U   <-- 안된다.
@@ -342,13 +450,11 @@ mvn clean install -e -U -Dmaven.test.skip=true
 
 
 
+#### 오류 발생
 
+새로운 version 을 가져와야 하는 상황에서는 아래와 같이 에러 발생한다.
 
-
-
-새로운 version 을 가져와야 하는 상황에서는 아래와 같이 
-
-"Could not transfer artifact ..."  에러 발생한다.
+"Could not transfer artifact ..."  
 
 
 
@@ -399,15 +505,247 @@ No versions available for com.ssongman.airport:airport-core:jar:[0.1.0,) within 
 
 
 
-실행
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 4) version maven plugin
+
+관련링크 : https://www.mojohaus.org/versions/versions-maven-plugin/index.html
+
+Version Maven Plugin 은 POM의 artifacts 의 Version 을 관리하는 경우 사용되며 MojoHaus 에서 제공된다.
+
+MojoHaus 프로젝트는 Apache Maven용 플러그인 모음이다.
+
+
+
+#### version plugin 지정
+
+먼저 pom.xml plugin 을 지정한다.
+
+```xml
+
+
+	<build>
+		<plugins>
+            
+			<!-- To use the plugin goals in your POM or parent POM -->
+	        <plugin>
+	          <groupId>org.codehaus.mojo</groupId>
+	          <artifactId>versions-maven-plugin</artifactId>
+	          <version>2.15.0</version>
+	        </plugin>
+
+		</plugins>
+	</build>
+```
+
+* 굳이 선언하지 않아도 아래 명령어들이 잘 작동되었다.  왜지?
+
+
+
+
+
+#### resolve-ranges
+
+range 로 지정된 pom.xml 을 조건에 맞는 버젼(최신버젼)을 가져와 셋팅하고 pom.xml 파일이 수정된다.
+
+기존 파일은 "pom.xml.versionsBackup" 로 보관다. 
+
+이후 commit 을 수행하게 되면 versionsBackup 파일은 삭제 된다.
+
+````sh
+
+# 수행전
+...
+		<dependency>
+		  <groupId>com.ssongman.airport</groupId>
+		  <artifactId>airport-core</artifactId>
+		  <version>[0.0.5,)</version>
+		</dependency>
+...
+
+
+
+$ mvn versions:resolve-ranges
+# 잘 반영됨
+
+
+
+# 수행후 - version이 최신버젼으로 변경됨.
+...
+		<dependency>
+		  <groupId>com.ssongman.airport</groupId>
+		  <artifactId>airport-core</artifactId>
+		  <version>0.1.6.5</version>
+		</dependency>
+...
+
+
+
+# 변경 범위를 축소시킬 수 있다. -  groupID 이용
+$ mvn versions:resolve-ranges -Dincludes=com.ssongman.airport:airport-core
+
+$ mvn versions:resolve-ranges -Dincludes=com.ssongman.airport:*
+
+
+
+
+# commit - versionsBackup 삭제된다.
+$ mvn versions:commit
+
+# rollback - versionsBackup 파일로 원복후 파일은 삭제된다.
+$ mvn versions:revert
+
+````
+
+
+
+
+
+
+
+#### display-plugin-updates
+
+빌드에서 사용중인 plugin 버젼중 새로운 버젼을 보여준다.
 
 ```sh
-$ curl localhost:8081/api/health
+mvn versions:display-plugin-updates
+```
 
-$ curl localhost:8081/api/planes
 
+
+
+
+#### display-dependency-updates
+
+사용중인 라이브러리들 update 대상 버젼 목록 추출 한다.
+
+```sh
+
+# 
+$ mvn versions:display-dependency-updates
+...
+[INFO]   org.jetbrains.kotlin:kotlin-test-common ....... 1.8.22 -> 1.9.20-Beta2
+[INFO]   org.jetbrains.kotlin:kotlin-test-js ........... 1.8.22 -> 1.9.20-Beta2
+[INFO]   org.jetbrains.kotlin:kotlin-test-junit ........ 1.8.22 -> 1.9.20-Beta2
+[INFO]   org.jetbrains.kotlin:kotlin-test-junit5 ....... 1.8.22 -> 1.9.20-Beta2
+[INFO]   org.jetbrains.kotlin:kotlin-test-testng ....... 1.8.22 -> 1.9.20-Beta2
+...
+
+
+# 특정 접미사 무시
+$ mvn versions:display-dependency-updates "-Dmaven.version.ignore=.*-M.*,.*-Beta2"
+
+
+$ mvn org.codehaus.mojo:versions-maven-plugin:display-dependency-updates "-Dmaven.version.ignore=.*-M.*,.*-alpha.*"
+
+
+```
+
+
+
+#### display-property-updates
+
+```sh
+
+$ mvn versions:display-property-updates
+[INFO] Scanning for projects...
+Downloading from central: https://repo.maven.apache.org/maven2/org/codehaus/mojo/versions-maven-plugin/2.16.1/versions-maven-plugin-2.16.1.jar
+Downloaded from central: https://repo.maven.apache.org/maven2/org/codehaus/mojo/versions-maven-plugin/2.16.1/versions-maven-plugin-2.16.1.jar (291 kB at 505 kB/s)
+[INFO] 
+[INFO] ------------------< com.ssongman.airport:airport-api >------------------
+[INFO] Building airport-api 0.0.2.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- versions:2.16.1:display-property-updates (default-cli) @ airport-api ---
+[INFO] 
+[INFO] This project does not have any properties associated with versions.
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  3.937 s
+[INFO] Finished at: 2023-10-08T23:13:50+09:00
+[INFO] ------------------------------------------------------------------------
+
+```
+
+
+
+
+
+#### set project version
+
+project version 을 변경 할 수 있다.
+
+당연히 ${project.version} 를 사용하는 부분도 같이 변경된다.
+
+```sh
+# 수행전
+...
+	<groupId>com.ssongman.airport</groupId>
+	<artifactId>airport-api</artifactId>
+    <version>0.0.2.0</version>
+	<name>airport-api</name>
+...
+
+
+
+$ mvn versions:set -DnewVersion=0.0.2.6
+
+
+# 수행후
+...
+	<groupId>com.ssongman.airport</groupId>
+	<artifactId>airport-api</artifactId>
+    <version>0.0.2.6</version>
+	<name>airport-api</name>
+...
+
+
+
+# commit - versionsBackup 삭제된다.
+$ mvn versions:commit
+
+# rollback - versionsBackup 파일로 원복후 파일은 삭제된다.
+$ mvn versions:revert
+
+```
+
+
+
+clean / install 과 같이 사용 하지 말자.
+
+```sh
+
+# version 이 변경된 후 clean / install 해야 할텐데 그렇지 않다.
+# 변경전 값으로 clean install 된다.
+$ mvn versions:set -DnewVersion=0.0.2.6 -DskipTests clean install -U
+
+
+
+# 굳이 사용하려면 아래와 같이 나눠서 사용하자.
+
+$ mvn versions:set -DnewVersion=0.0.2.6
+$ mvn -DskipTests clean install -U
+
+
+# 그냥 revision 방식으로 한방 command 가 빠를 듯... ★★★
+# mvn -X -Drevision=0.0.2.6 -DskipTests clean install -U
 ```
 
 
@@ -416,7 +754,13 @@ $ curl localhost:8081/api/planes
 
 
 
-## 4) version 명시 deploy
+
+
+
+
+
+
+## 5) version 명시 deploy
 
 pom.xml
 
@@ -445,7 +789,7 @@ mvn -Drevision=0.0.2.0 -DskipTests clean install
 mvn -Drevision=0.0.2.1 -DskipTests clean install 
 mvn -Drevision=0.0.2.3 -DskipTests clean install 
 mvn -X -Drevision=0.0.2.5 -DskipTests clean install -U
-
+mvn -X -Drevision=0.0.2.6 -DskipTests clean install -U
 
 ```
 
