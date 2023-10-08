@@ -4,9 +4,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	
 	<parent>
-		<groupId>com.ssongman.airport</groupId>
-		<artifactId>airport-management</artifactId>
-		<version>0.0.3-SNAPSHOT</version>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.1.4</version>
+		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	
 	<artifactId>airport-core</artifactId>

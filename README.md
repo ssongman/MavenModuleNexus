@@ -1,13 +1,5 @@
-# MavenModuleNexus
-Nexus를 활용한 Maven Module
-
-
-
-
-
-
-
 # Nexus를 활용한 Maven Module
+
 
 
 
@@ -29,17 +21,16 @@ nexus 링크 : http://nexus.ssongman.duckdns.org/#admin/security/users
 
 ## 2) maven repo 추가
 
+생략
+
 
 
 ## 3) Role 생성
 
-메뉴 : Administration > Security > Roles
-
-ID :  ssongman-admin-role
-
-
-
-필터란에 생성한 레파지토리명으로 검색해서 **nx-repository-view-…** 로 시작하는 권한들을 넣어주고, 해당 Role로 레파지토리에 업로드도 할 수 있게 하기 위해 **nx-component-upload** 권한도 넣어준다.
+- 메뉴 : Administration > Security > Roles
+- ID :  ssongman-admin-role
+- 필터란에 생성한 레파지토리명으로 검색해서 **nx-repository-view-…** 로 시작하는 권한들 추가
+- 해당 Role로 레파지토리에 업로드도 할 수 있게 하기 위해 **nx-component-upload** 권한 추가
 
 
 
@@ -47,13 +38,10 @@ ID :  ssongman-admin-role
 
 ## 4) User 생성
 
-메뉴 : Administration > Security > Users
-
-ID : ssongman-admin
-
-pass : new1234!
-
-Roles : ssongman-admin-role
+- 메뉴 : Administration > Security > Users
+- ID : ssongman-admin
+- pass : new****!
+- Roles : ssongman-admin-role
 
 
 
@@ -81,7 +69,7 @@ Roles : ssongman-admin-role
    <server>
      <id>ssongman-repo</id>
      <username>ssongman-admin</username>
-     <password>new1234!</password>
+     <password>new****!</password>
    </server>
  </servers>
 </settings>
@@ -159,7 +147,7 @@ pom.xml
 <groupId>net.test</groupId>
 <artifactId>test-parent</artifactId>
 <version>${revision}</version>
-
+...
 <properties>
   <revision>0.1.0</revision>
 </properties>
@@ -207,17 +195,7 @@ mvn -Drevision=0.1.6.6 -DskipTests clean compile deploy
 # 이제는 특정값으로
 mvn -Drevision=0.1.6.7-Beta1 -DskipTests clean compile deploy
 mvn -Drevision=0.1.6.8 -DskipTests clean compile deploy
-
-
-
-############# 참고 ##############################
-
-
-$ mvn -Drevision=0.1.1 clean
-
-$ mvn -Drevision=0.1.1 clean package
-
-
+mvn -Drevision=0.1.6.9 -DskipTests clean compile deploy
 
 ```
 
@@ -229,13 +207,9 @@ $ mvn -Drevision=0.1.1 clean package
 
 
 
-
-
-
-
 # 3. 업로드된 library 사용
 
-업로드된 라이브러리를 사용하기 위해서 사용하고자 하는 프로젝트의 pom.xml에 아래와 같은 설정을 추가해준다.
+업로드된 라이브러리를 사용하기 위해서 사용하고자 하는 프로젝트의 pom.xml에 아래와 같은 설정을 추가한다.
 
 
 
@@ -291,6 +265,8 @@ $ curl localhost:8081/api/planes
 
 ## 3) maven version range
 
+항상 모듈의 최신버젼을 참고하도록 설정하기 위해 version range 방법을 사용한다.
+
 참고링크 : https://maven.apache.org/enforcer/enforcer-rules/versionRanges.html
 
 
@@ -337,7 +313,11 @@ RequireMavenVersion 및 RequireJavaVersion 규칙은 사용 편의성을 위해 
 
 ### (2) 최신버젼 작동원리
 
-range 내에서 최신버젼 셋팅은 아래 metadata 파일을 가져온 이후 
+range 내에서 최신버젼 셋팅은 아래 metadata 파일을 가져온 이후 최신버젼을 셋팅하도록 구성되는 듯 하다.
+
+.m2 캐쉬 위치를 살펴보면서 테스트 한 결과 ...
+
+version range 로 셋팅후 수행하면 아래 파일을 가져오고 특정 버젼을 명시하면 해당 버젼만 가져온다.
 
 maven-metadata.xml
 
@@ -387,10 +367,6 @@ maven-metadata.xml
 
 
 
-
-
-
-
 ### (2) 최신버젼 적용
 
 module(library) 이 최신버젼으로 release 되어 nexus 에 upload 되었다.
@@ -407,7 +383,7 @@ module(library) 이 최신버젼으로 release 되어 nexus 에 upload 되었다
 
 
 
-아래와 같이 특정 이벤트가 있어야지만 반영이 된다.
+아래와 같이 특정 이벤트가 있어야지만 자동 반영이 된다.
 
 * STS Update Maven Project (Alt + F5)
 * pom.xml 파일 수정
@@ -415,7 +391,11 @@ module(library) 이 최신버젼으로 release 되어 nexus 에 upload 되었다
 
 
 
-CICD 자동화 스크립트시 간헐적으로 최신버젼을 가져오지 못하는 현상이 있어서 강제로 update 하는 부분이 있어야 한다.
+Jenkins 를 활용한 CI 에서는 당연히 이벤트가 발생할 것이므로 최신버젼을 잘 가져올 것이라고 판단된다. 
+
+(가져오지 못하는 상황은 아지 확인 전임)
+
+그럼에도 불구하고 CICD 자동화 스크립트시 좀더 확실하게 최신버젼을 가져올 수 있도록 강제로 update 하는 부분을 찾아본다.
 
 
 
@@ -434,7 +414,7 @@ mvn dependency:resolve   <-- 안된다.
 
 mvn dependency:resolve -U  <-- 안된다.
 
-mvn dependency:resolve -U -Dmaven.wagon.http.ssl.insecure=true 
+mvn dependency:resolve -U -Dmaven.wagon.http.ssl.insecure=true  <-- 안된다.
 
 
 # refresh workspace 
@@ -452,7 +432,7 @@ mvn clean install -e -U -Dmaven.test.skip=true
 
 #### 오류 발생
 
-새로운 version 을 가져와야 하는 상황에서는 아래와 같이 에러 발생한다.
+nexus 에는 새로운 버젼이 올라가 있지만 최신버젼을 가져오지 못하는 상황에서는 아래와 같이 에러 발생한다.
 
 "Could not transfer artifact ..."  
 
@@ -501,19 +481,7 @@ No versions available for com.ssongman.airport:airport-core:jar:[0.1.0,) within 
 
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+어떻게든 최신버젼을 매핑하는 방법을 찾아야 한다.
 
 
 
@@ -523,11 +491,13 @@ No versions available for com.ssongman.airport:airport-core:jar:[0.1.0,) within 
 
 ## 4) version maven plugin
 
-관련링크 : https://www.mojohaus.org/versions/versions-maven-plugin/index.html
+Version 관리하는 plugin 을 활용하는 방법을 검토해 보자.
 
 Version Maven Plugin 은 POM의 artifacts 의 Version 을 관리하는 경우 사용되며 MojoHaus 에서 제공된다.
 
 MojoHaus 프로젝트는 Apache Maven용 플러그인 모음이다.
+
+관련링크 : https://www.mojohaus.org/versions/versions-maven-plugin/index.html
 
 
 
@@ -552,7 +522,7 @@ MojoHaus 프로젝트는 Apache Maven용 플러그인 모음이다.
 	</build>
 ```
 
-* 굳이 선언하지 않아도 아래 명령어들이 잘 작동되었다.  왜지?
+* 굳이 선언하지 않아도 아래 명령어들이 잘 작동되었다.   왜지?
 
 
 
@@ -622,7 +592,9 @@ $ mvn versions:revert
 빌드에서 사용중인 plugin 버젼중 새로운 버젼을 보여준다.
 
 ```sh
-mvn versions:display-plugin-updates
+$ mvn versions:display-plugin-updates
+
+# 굳이...
 ```
 
 
@@ -694,6 +666,8 @@ project version 을 변경 할 수 있다.
 
 당연히 ${project.version} 를 사용하는 부분도 같이 변경된다.
 
+실제로 pom.xml 이 변경된다.
+
 ```sh
 # 수행전
 ...
@@ -747,14 +721,6 @@ $ mvn -DskipTests clean install -U
 # 그냥 revision 방식으로 한방 command 가 빠를 듯... ★★★
 # mvn -X -Drevision=0.0.2.6 -DskipTests clean install -U
 ```
-
-
-
-
-
-
-
-
 
 
 
