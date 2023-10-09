@@ -27,13 +27,7 @@ nexus 링크 : http://nexus.ssongman.duckdns.org/#admin/security/users
 
 ## 2) maven repo 추가
 
-<<<<<<< HEAD
 Maven repo 추가 과정 생략
-
-
-=======
-repository 구성 과정 생략
->>>>>>> 401fbd91f2e92b0f0b4140e5b4c74b42226009f7
 
 
 
