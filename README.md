@@ -2,6 +2,14 @@
 
 
 
+Nexus를 활용한 Maven Module 활용법을 살펴본다.
+
+또한 Module 이 버젼업시에 해당 모듈을 Main 프로젝트에서 자동으로 참고하는 방법에 대해서 살펴본다.
+
+
+
+
+
 
 # 1. Nexus 셋팅
 
@@ -11,8 +19,6 @@
 
 설치스크립트 생략
 
-
-
 nexus 링크 : http://nexus.ssongman.duckdns.org/#admin/security/users
 
 
@@ -21,7 +27,7 @@ nexus 링크 : http://nexus.ssongman.duckdns.org/#admin/security/users
 
 ## 2) maven repo 추가
 
-생략
+repository 구성 과정 생략
 
 
 
