@@ -217,9 +217,40 @@ mvn -Drevision=0.1.6.7-Beta1 -DskipTests clean compile deploy
 mvn -Drevision=0.1.6.8 -DskipTests clean compile deploy
 mvn -Drevision=0.1.6.9 -DskipTests clean compile deploy
 
+
+
 ```
 
 
+
+* 아래 버젼이 올바르게 인식하는지 확인해 보자. (오라클문서와 비교)
+  * https://docs.oracle.com/middleware/1212/core/MAVEN/maven_version.htm#MAVEN401
+
+```sh
+1.0.1.0
+1.0.9.3
+1.0.10.1
+1.0.10.2
+
+
+# 오라클 문서에는 아래처럼 정렬된다고 한다.
+1.0.1.0
+1.0.10.1
+1.0.10.2
+1.0.9.3
+# Version 1.0.9.3 should come before 1.0.10.1 and 1.0.10.2, 
+# but the unexpected fourth field (.3) forced Maven to evaluate the version as a string.
+
+
+# deploy
+mvn -Drevision=1.0.1.0  -DskipTests clean compile deploy
+mvn -Drevision=1.0.9.3  -DskipTests clean compile deploy
+mvn -Drevision=1.0.10.1 -DskipTests clean compile deploy
+mvn -Drevision=1.0.10.2 -DskipTests clean compile deploy
+mvn -Drevision=1.0.9.4 -DskipTests clean compile deploy
+
+
+```
 
 
 
@@ -598,6 +629,7 @@ range 로 지정된 pom.xml 을 조건에 맞는 버젼(최신버젼)을 가져�
 
 $ mvn versions:resolve-ranges
 # 잘 반영됨
+# Total time:  21.700 s
 
 
 
@@ -614,6 +646,7 @@ $ mvn versions:resolve-ranges
 
 # 변경 범위를 축소시킬 수 있다. -  groupID 이용
 $ mvn versions:resolve-ranges -Dincludes=com.ssongman.airport:airport-core
+# Total time:  7.980 s
 
 $ mvn versions:resolve-ranges -Dincludes=com.ssongman.airport:*
 

@@ -10,6 +10,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	
+	<groupId>com.ssongman.airport</groupId>
 	<artifactId>airport-core</artifactId>
 	<version>${revision}</version>
 	<name>airport-core</name>
