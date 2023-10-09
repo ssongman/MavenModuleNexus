@@ -9,7 +9,7 @@
 
 ## 1) Nexus 설치
 
-설치스크립트 생략
+설치과정 생략
 
 
 
@@ -21,7 +21,9 @@ nexus 링크 : http://nexus.ssongman.duckdns.org/#admin/security/users
 
 ## 2) maven repo 추가
 
-생략
+Maven repo 추가 과정 생략
+
+
 
 
 
@@ -47,11 +49,21 @@ nexus 링크 : http://nexus.ssongman.duckdns.org/#admin/security/users
 
 
 
-# 2. library 업로드
+# 2. Module Project
+
+간단한 module 을 개발후 Nexus 에 배포해보자.
 
 
 
-## 1) settings.xml 설정
+## 1) Module src
+
+https://github.com/ssongman/MavenModuleNexus/tree/main/SampleSrc/airport-core
+
+
+
+
+
+## 2) settings.xml 설정
 
 
 
@@ -80,7 +92,7 @@ nexus 링크 : http://nexus.ssongman.duckdns.org/#admin/security/users
 
 
 
-## 2) pom.xml
+## 3) pom.xml
 
 nexus repository에 업로드 하기 위해 pom.xml
 
@@ -101,9 +113,9 @@ nexus repository에 업로드 하기 위해 pom.xml
 
 
 
-## 3) library 배포
+## 4) Deploy
 
-
+해당 모듈을 compile 후 nexus 에 배포해보자.
 
 ```sh
 $ mvn clean compile deploy
@@ -138,9 +150,13 @@ http://nexus.ssongman.duckdns.org/#browse/browse:ssongman-repo:com%2Fssongman%2F
 
 
 
-## 4) version 명시 deploy
+## 5) Deploy(version 명시)
 
-pom.xml
+mvn 명령 수행시 version 명시하기 위해서는 properties 기능을 이용한다.
+
+ 
+
+* pom.xml
 
 ```xml
 ...
@@ -158,7 +174,7 @@ pom.xml
 
 
 
-deploy
+* deploy
 
 ```sh
 
@@ -207,15 +223,23 @@ mvn -Drevision=0.1.6.9 -DskipTests clean compile deploy
 
 
 
-# 3. 업로드된 library 사용
+# 3. Main Project
 
-업로드된 라이브러리를 사용하기 위해서 사용하고자 하는 프로젝트의 pom.xml에 아래와 같은 설정을 추가한다.
+업로드된 모듈을 사용하는 AP를 개발 및 설정해 보자.
 
 
 
-## 1) pom.xml
+## 1) AP src
 
-사용하고자 하는 프로젝트의 pom.xml
+https://github.com/ssongman/MavenModuleNexus/tree/main/SampleSrc/airport-api
+
+
+
+## 2) pom.xml
+
+pom.xml에 아래와 같은 설정을 추가한다.
+
+* pom.xml
 
 ```xml
 <!-- 모듈화되서 업로드된 도메인 프로젝트 -->
@@ -227,7 +251,6 @@ mvn -Drevision=0.1.6.9 -DskipTests clean compile deploy
 		</dependency>
 
 ...
-
 
 
 	<!-- 라이브러리가 업로드된 Nexus Repository 정보 -->
@@ -248,28 +271,40 @@ mvn -Drevision=0.1.6.9 -DskipTests clean compile deploy
 
 
 
-## 2) 실행
+## 3) 실행 후 테스트
 
 #### 실행
+
+```sh
+STS 실행
+
+```
+
+
+
+#### 테스트
 
 ```sh
 $ curl localhost:8081/api/health
 
 $ curl localhost:8081/api/planes
-
 ```
 
 
 
 
 
-## 3) maven version range
+## 4) maven version range
 
-항상 모듈의 최신버젼을 참고하도록 설정하기 위해 version range 방법을 사용한다.
+모듈이 버젼업 된다면 해당 모듈을 참고하는 Main AP 에서도 버젼을 변경해야 하는 번거러움이 존재한다.
+
+이런 번거러움을 해결하기 위해 version range 방법을 이요하여 항상 모듈의 최신버젼을 참고하도록 설정해보자.
 
 참고링크 : https://maven.apache.org/enforcer/enforcer-rules/versionRanges.html
 
 
+
+### (1) [참고] version range
 
 RequireMavenVersion 및 RequireJavaVersion 규칙은 사용 편의성을 위해 한 가지 사소한 변경 사항이 포함된 표준 Maven 버전 범위 구문을 사용합니다(*로 표시).
 
@@ -290,7 +325,7 @@ RequireMavenVersion 및 RequireJavaVersion 규칙은 사용 편의성을 위해 
 
 
 
-### (1) range 지정
+### (2) range 지정
 
 ```xml
 <!-- 모듈화된 업로드된 도메인 프로젝트 -->
@@ -311,13 +346,25 @@ RequireMavenVersion 및 RequireJavaVersion 규칙은 사용 편의성을 위해 
 
 
 
-### (2) 최신버젼 작동원리
+### (3) 최신버젼 작동원리
 
-range 내에서 최신버젼 셋팅은 아래 metadata 파일을 가져온 이후 최신버젼을 셋팅하도록 구성되는 듯 하다.
+최신버젼이 셋팅되는 원리를 살펴보자.
 
-.m2 캐쉬 위치를 살펴보면서 테스트 한 결과 ...
+테스트 결과 .m2 캐쉬의 내용이 테스트 방법에 따라 다르다는 것을 알 수 있었다.
 
-version range 로 셋팅후 수행하면 아래 파일을 가져오고 특정 버젼을 명시하면 해당 버젼만 가져온다.
+테스트 하는 방법에 따른 .m2 캐쉬 의 반응을 살펴보면...
+
+* pom.xml 에 특정 버젼을 명시하는 방법으로 수행시
+  * 해당 버젼의 모듈만 가져온다.
+* pom.xml에 version range 로 셋팅후 수행시
+  * 범위에 따른 모든 버젼의 모듈을 가져온다.
+  * metadat.xml 파일을 가져온다.
+
+
+
+그러므로 range 내에서 아래 metadata 파일을 가져온 이후 최신버젼을 셋팅하도록 구성되는 듯 하다.
+
+
 
 maven-metadata.xml
 
@@ -367,19 +414,15 @@ maven-metadata.xml
 
 
 
-### (2) 최신버젼 적용
+### (4) 최신버젼 적용
 
-module(library) 이 최신버젼으로 release 되어 nexus 에 upload 되었다.
+신규버젼 모듈이 nexus에 upload 되었는데 Local PC Main AP소스에서는 아무런 이벤트 없이 해당 모듈의 최신  버젼을 자동으로 셋팅하지는 않는다. 
 
-* airport-core 버젼업
-  * 0.1.6.0  -->  0.1.6.1 upload
-
-
-
-하지만 Local PC 에서의 소스에서는 아무런 이벤트 없이 해당 모듈의 최신  버젼을 자동으로 가져오지는 않는다. 
-
-* Maven Dependencies 확인
-  * airport-core-0.1.6.0.jar 파일로 유지 됨.
+* nexus에 업로드 된 airport-core 버젼업
+  * airport-core-0.1.6.0
+  * airport-core-0.1.6.1   <-- 신규로 upload 됨
+* Main AP Maven Dependencies 확인
+  * airport-core-0.1.6.0.jar  파일로 유지 됨.
 
 
 
@@ -391,7 +434,7 @@ module(library) 이 최신버젼으로 release 되어 nexus 에 upload 되었다
 
 
 
-Jenkins 를 활용한 CI 에서는 당연히 이벤트가 발생할 것이므로 최신버젼을 잘 가져올 것이라고 판단된다. 
+하지만, Jenkins를 활용한 CI에서는 당연히 이벤트가 발생할 것이므로 최신버젼을 잘 가져올 것이라고 판단된다. 
 
 (가져오지 못하는 상황은 아지 확인 전임)
 
@@ -487,9 +530,7 @@ No versions available for com.ssongman.airport:airport-core:jar:[0.1.0,) within 
 
 
 
-
-
-## 4) version maven plugin
+## 5) version maven plugin
 
 Version 관리하는 plugin 을 활용하는 방법을 검토해 보자.
 
@@ -501,7 +542,7 @@ MojoHaus 프로젝트는 Apache Maven용 플러그인 모음이다.
 
 
 
-#### version plugin 지정
+### version plugin 지정
 
 먼저 pom.xml plugin 을 지정한다.
 
@@ -526,9 +567,11 @@ MojoHaus 프로젝트는 Apache Maven용 플러그인 모음이다.
 
 
 
+몇몇 유용한 plugin 들을 살펴보자.
 
 
-#### resolve-ranges
+
+### version:resolve-ranges
 
 range 로 지정된 pom.xml 을 조건에 맞는 버젼(최신버젼)을 가져와 셋팅하고 pom.xml 파일이 수정된다.
 
@@ -583,86 +626,18 @@ $ mvn versions:revert
 
 
 
+* Jenkins CI 에서의 사용방안
+  * resolve-ranges 기능을 이용해 최신버젼을 set하여 build 한다.
+  * 이후 git  에 commit push 는 하지 않는다.(Build 시에만 사용한다.)
+  * 단점
+    * resolve-ranges 수행하는 시간만큼 더 소요된다.
+    * 약 10초 소요(pom.xml 의 양에 따라 달라짐)
 
 
 
+### version:set (project version)
 
-#### display-plugin-updates
-
-빌드에서 사용중인 plugin 버젼중 새로운 버젼을 보여준다.
-
-```sh
-$ mvn versions:display-plugin-updates
-
-# 굳이...
-```
-
-
-
-
-
-#### display-dependency-updates
-
-사용중인 라이브러리들 update 대상 버젼 목록 추출 한다.
-
-```sh
-
-# 
-$ mvn versions:display-dependency-updates
-...
-[INFO]   org.jetbrains.kotlin:kotlin-test-common ....... 1.8.22 -> 1.9.20-Beta2
-[INFO]   org.jetbrains.kotlin:kotlin-test-js ........... 1.8.22 -> 1.9.20-Beta2
-[INFO]   org.jetbrains.kotlin:kotlin-test-junit ........ 1.8.22 -> 1.9.20-Beta2
-[INFO]   org.jetbrains.kotlin:kotlin-test-junit5 ....... 1.8.22 -> 1.9.20-Beta2
-[INFO]   org.jetbrains.kotlin:kotlin-test-testng ....... 1.8.22 -> 1.9.20-Beta2
-...
-
-
-# 특정 접미사 무시
-$ mvn versions:display-dependency-updates "-Dmaven.version.ignore=.*-M.*,.*-Beta2"
-
-
-$ mvn org.codehaus.mojo:versions-maven-plugin:display-dependency-updates "-Dmaven.version.ignore=.*-M.*,.*-alpha.*"
-
-
-```
-
-
-
-#### display-property-updates
-
-```sh
-
-$ mvn versions:display-property-updates
-[INFO] Scanning for projects...
-Downloading from central: https://repo.maven.apache.org/maven2/org/codehaus/mojo/versions-maven-plugin/2.16.1/versions-maven-plugin-2.16.1.jar
-Downloaded from central: https://repo.maven.apache.org/maven2/org/codehaus/mojo/versions-maven-plugin/2.16.1/versions-maven-plugin-2.16.1.jar (291 kB at 505 kB/s)
-[INFO] 
-[INFO] ------------------< com.ssongman.airport:airport-api >------------------
-[INFO] Building airport-api 0.0.2.0
-[INFO]   from pom.xml
-[INFO] --------------------------------[ jar ]---------------------------------
-[INFO]
-[INFO] --- versions:2.16.1:display-property-updates (default-cli) @ airport-api ---
-[INFO] 
-[INFO] This project does not have any properties associated with versions.
-[INFO]
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time:  3.937 s
-[INFO] Finished at: 2023-10-08T23:13:50+09:00
-[INFO] ------------------------------------------------------------------------
-
-```
-
-
-
-
-
-#### set project version
-
-project version 을 변경 할 수 있다.
+project version을 변경 할 수 있다.
 
 당연히 ${project.version} 를 사용하는 부분도 같이 변경된다.
 
@@ -705,7 +680,6 @@ $ mvn versions:revert
 clean / install 과 같이 사용 하지 말자.
 
 ```sh
-
 # version 이 변경된 후 clean / install 해야 할텐데 그렇지 않다.
 # 변경전 값으로 clean install 된다.
 $ mvn versions:set -DnewVersion=0.0.2.6 -DskipTests clean install -U
@@ -713,20 +687,95 @@ $ mvn versions:set -DnewVersion=0.0.2.6 -DskipTests clean install -U
 
 
 # 굳이 사용하려면 아래와 같이 나눠서 사용하자.
-
 $ mvn versions:set -DnewVersion=0.0.2.6
 $ mvn -DskipTests clean install -U
 
+```
 
-# 그냥 revision 방식으로 한방 command 가 빠를 듯... ★★★
-# mvn -X -Drevision=0.0.2.6 -DskipTests clean install -U
+* 그냥 revision 방식으로 한방 command 가 빠를 듯... ★★★
+
+  mvn -X -Drevision=0.0.2.6 -DskipTests clean install -U
+
+
+
+
+
+### version:display-plugin-updates
+
+빌드에서 사용중인 plugin 버젼중 새로운 버젼을 보여준다.
+
+```sh
+$ mvn versions:display-plugin-updates
+
+# 굳이...
 ```
 
 
 
 
 
-## 5) version 명시 deploy
+### version:display-dependency-updates
+
+사용중인 라이브러리들 update 대상 버젼 목록 추출 한다.
+
+```sh
+
+# 
+$ mvn versions:display-dependency-updates
+...
+[INFO]   org.jetbrains.kotlin:kotlin-test-common ....... 1.8.22 -> 1.9.20-Beta2
+[INFO]   org.jetbrains.kotlin:kotlin-test-js ........... 1.8.22 -> 1.9.20-Beta2
+[INFO]   org.jetbrains.kotlin:kotlin-test-junit ........ 1.8.22 -> 1.9.20-Beta2
+[INFO]   org.jetbrains.kotlin:kotlin-test-junit5 ....... 1.8.22 -> 1.9.20-Beta2
+[INFO]   org.jetbrains.kotlin:kotlin-test-testng ....... 1.8.22 -> 1.9.20-Beta2
+...
+
+
+# 특정 접미사 무시
+$ mvn versions:display-dependency-updates "-Dmaven.version.ignore=.*-M.*,.*-Beta2"
+
+
+$ mvn org.codehaus.mojo:versions-maven-plugin:display-dependency-updates "-Dmaven.version.ignore=.*-M.*,.*-alpha.*"
+
+
+```
+
+* 가끔씩 사용하면 유용할듯...
+
+
+
+### version:display-property-updates
+
+```sh
+
+$ mvn versions:display-property-updates
+[INFO] Scanning for projects...
+Downloading from central: https://repo.maven.apache.org/maven2/org/codehaus/mojo/versions-maven-plugin/2.16.1/versions-maven-plugin-2.16.1.jar
+Downloaded from central: https://repo.maven.apache.org/maven2/org/codehaus/mojo/versions-maven-plugin/2.16.1/versions-maven-plugin-2.16.1.jar (291 kB at 505 kB/s)
+[INFO] 
+[INFO] ------------------< com.ssongman.airport:airport-api >------------------
+[INFO] Building airport-api 0.0.2.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- versions:2.16.1:display-property-updates (default-cli) @ airport-api ---
+[INFO] 
+[INFO] This project does not have any properties associated with versions.
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  3.937 s
+[INFO] Finished at: 2023-10-08T23:13:50+09:00
+[INFO] ------------------------------------------------------------------------
+
+```
+
+
+
+
+
+## 6) Install(version 명시)
 
 pom.xml
 
