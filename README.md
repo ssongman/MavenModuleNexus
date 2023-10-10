@@ -181,7 +181,6 @@ mvn 명령 수행시 version 명시하기 위해서는 properties 기능을 이�
 * deploy
 
 ```sh
-
 $ mvn -Drevision=0.1.0  clean compile deploy
 $ mvn -Drevision=0.1.1  clean compile deploy
 $ mvn -Drevision=0.1.2  clean compile deploy
@@ -223,6 +222,8 @@ mvn -Drevision=0.1.6.9 -DskipTests clean compile deploy
 
 
 
+## 6) Deploy(oracle문서비교)
+
 * 아래 버젼이 올바르게 인식하는지 확인해 보자. (오라클문서와 비교)
   * https://docs.oracle.com/middleware/1212/core/MAVEN/maven_version.htm#MAVEN401
 
@@ -251,6 +252,8 @@ mvn -Drevision=1.0.9.4 -DskipTests clean compile deploy
 
 
 ```
+
+
 
 
 
@@ -404,7 +407,6 @@ RequireMavenVersion 및 RequireJavaVersion 규칙은 사용 편의성을 위해 
 maven-metadata.xml
 
 ```xml
-
 <?xml version="1.0" encoding="UTF-8"?>
 <metadata>
   <groupId>com.ssongman.airport</groupId>
@@ -583,7 +585,6 @@ MojoHaus 프로젝트는 Apache Maven용 플러그인 모음이다.
 
 ```xml
 
-
 	<build>
 		<plugins>
             
@@ -615,7 +616,6 @@ range 로 지정된 pom.xml 을 조건에 맞는 버젼(최신버젼)을 가져�
 이후 commit 을 수행하게 되면 versionsBackup 파일은 삭제 된다.
 
 ````sh
-
 # 수행전
 ...
 		<dependency>
@@ -756,7 +756,6 @@ $ mvn versions:display-plugin-updates
 사용중인 라이브러리들 update 대상 버젼 목록 추출 한다.
 
 ```sh
-
 # 
 $ mvn versions:display-dependency-updates
 ...
@@ -784,7 +783,6 @@ $ mvn org.codehaus.mojo:versions-maven-plugin:display-dependency-updates "-Dmave
 ### version:display-property-updates
 
 ```sh
-
 $ mvn versions:display-property-updates
 [INFO] Scanning for projects...
 Downloading from central: https://repo.maven.apache.org/maven2/org/codehaus/mojo/versions-maven-plugin/2.16.1/versions-maven-plugin-2.16.1.jar
@@ -844,6 +842,543 @@ mvn -X -Drevision=0.0.2.5 -DskipTests clean install -U
 mvn -X -Drevision=0.0.2.6 -DskipTests clean install -U
 
 ```
+
+
+
+
+
+
+
+
+
+
+
+# 4. flattern
+
+
+
+
+
+## 1) airport-core
+
+```sh
+$ mvn -Drevision=1.0.0-SNAPSHOT -DskipTests clean package
+
+
+$ mvn clean
+  mvn -Drevisionsong=2.0.0.2 -DskipTests clean package
+
+
+$ mvn -Drevision=2.0.0.2 -DskipTests clean package
+
+$ mvn -Drevision=3.1.4 -DskipTests clean package
+
+mvn -Drevision=2.0.0.4 -DskipTests clean install -U
+mvn -Drevision=2.0.0.5 -DskipTests clean install -U
+mvn -Drevision=2.0.0.6 -DskipTests clean install -U
+
+```
+
+
+
+
+
+pom.xml  - backup
+
+```xml
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.1.4</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+
+
+
+	<parent>
+		<groupId>com.ssongman.airport</groupId>
+		<artifactId>airport-api</artifactId>
+	    <version>2.0.0.0</version>
+	</parent>
+
+
+
+	<parent>
+		<groupId>com.ssongman.airport</groupId>
+		<artifactId>airport-api</artifactId>
+	    <version>${revision}</version>
+	</parent>
+
+
+
+
+	<properties>
+		<java.version>17</java.version>
+  		<revision>0.1.0</revision>
+  		<parentVersion>3.1.4</parentVersion>
+	</properties>
+
+
+
+	<properties>
+		<java.version>17</java.version>
+  		<revision>3.1.4</revision>
+	</properties>
+
+
+
+
+
+	<build>
+		<plugins>
+			<plugin>
+		       <groupId>org.codehaus.mojo</groupId>
+		       <artifactId>flatten-maven-plugin</artifactId>
+		       <version>${flatten.version}</version>
+		       <configuration>
+		         <updatePomFile>true</updatePomFile>
+		         <flattenMode>resolveCiFriendliesOnly</flattenMode>
+		       </configuration>
+		       <executions>
+		         <execution>
+		           <id>flatten</id>
+		           <phase>process-resources</phase>
+		           <goals>
+		             <goal>flatten</goal>
+		           </goals>
+		         </execution>
+		         <execution>
+		           <id>flatten.clean</id>
+		           <phase>clean</phase>
+		           <goals>
+		             <goal>clean</goal>
+		           </goals>
+		         </execution>
+		       </executions>
+		 </plugin> 
+ 
+		</plugins>
+	</build>
+```
+
+
+
+
+
+
+
+
+
+## 2) airport-api
+
+maven
+
+```sh
+$ mvn -Drevision=1.0.0-SNAPSHOT -DskipTests clean package
+
+
+$ mvn clean
+  mvn -Drevisionsong=2.0.0.2 -DskipTests clean package
+
+
+$ mvn -Drevision=2.0.0.2 -DskipTests clean package
+
+$ mvn -Drevision=3.1.4 -DskipTests clean package
+
+mvn -Drevision=2.0.0.4 -DskipTests clean install -U
+mvn -Drevision=2.0.0.5 -DskipTests clean install -U
+mvn -Drevision=2.0.0.6 -DskipTests clean install -U
+
+```
+
+
+
+
+
+pom.xml 
+
+```xml
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>${revision}</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+
+
+
+
+	<parent>
+		<groupId>com.ssongman.airport</groupId>
+		<artifactId>airport-api</artifactId>
+	    <version>${revision}</version>
+	</parent>
+
+
+
+
+	<properties>
+		<java.version>17</java.version>
+  		<revision>0.1.0</revision>
+  		<parentVersion>3.1.4</parentVersion>
+	</properties>
+
+
+
+	<properties>
+		<java.version>17</java.version>
+  		<revision>3.1.4</revision>
+	</properties>
+
+
+
+
+
+	<build>
+		<plugins>
+			<plugin>
+		       <groupId>org.codehaus.mojo</groupId>
+		       <artifactId>flatten-maven-plugin</artifactId>
+		       <version>${flatten.version}</version>
+		       <configuration>
+		         <updatePomFile>true</updatePomFile>
+		         <flattenMode>resolveCiFriendliesOnly</flattenMode>
+		       </configuration>
+		       <executions>
+		         <execution>
+		           <id>flatten</id>
+		           <phase>process-resources</phase>
+		           <goals>
+		             <goal>flatten</goal>
+		           </goals>
+		         </execution>
+		         <execution>
+		           <id>flatten.clean</id>
+		           <phase>clean</phase>
+		           <goals>
+		             <goal>clean</goal>
+		           </goals>
+		         </execution>
+		       </executions>
+		 </plugin> 
+ 
+		</plugins>
+	</build>
+```
+
+
+
+
+
+
+
+# 5. multi module build 방안
+
+ 
+
+N개의 module  과 Main AP 를 이어주는 중간 BOM project 를  생성하여 관리한다.
+
+AP 는 BOM Proejct 를 parent 로 선언하여 사용한다.
+
+
+
+## 1) module1 - airport-common
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.1.4</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	
+	<groupId>com.ssongman.airport</groupId>
+	<artifactId>airport-common</artifactId>
+	<version>${revision}</version>
+	<name>airport-common</name>
+	<description>Spring Boot Multi-Module Project(Maven)</description>
+	
+	<properties>
+		<java.version>17</java.version>
+  		<revision>1.0.0.3</revision>
+	</properties>
+
+</project>
+
+
+```
+
+
+
+```sh
+$ mvn -Drevision=1.0.0.2 -DskipTests clean install -U
+$ mvn -Drevision=1.0.0.3 -DskipTests clean install -U
+
+```
+
+
+
+
+
+
+
+
+
+## 2) module2 - airport-core
+
+
+
+```xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.1.4</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	
+	<groupId>com.ssongman.airport</groupId>
+	<artifactId>airport-core</artifactId>
+	<version>${revision}</version>
+	<name>airport-core</name>
+	<description>Demo project for Spring Boot Mult-Module</description>
+	
+	<properties>
+		<java.version>17</java.version>
+  		<revision>0.1.0</revision>
+	</properties>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	
+	<distributionManagement>
+	    <repository>
+	      <id>ssongman-repo</id>
+	      <name>ssongman nexus repository</name>
+	      <url>http://nexus.ssongman.duckdns.org/repository/ssongman-repo/</url>
+	    </repository>
+	</distributionManagement>
+
+
+</project>
+
+
+```
+
+
+
+
+
+```sh
+$ mvn -Drevision=2.0.0.5 -DskipTests clean install -U
+$ mvn -Drevision=2.0.0.6 -DskipTests clean install -U
+
+```
+
+
+
+
+
+
+
+
+
+## 3) icis-bom
+
+module 들을 version range 로 선언하여 최신버젼을 가져오거나
+
+사용자가 지절할 수 있도록 한다.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.1.4</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	
+	<groupId>com.ssongman.airport</groupId>
+	<artifactId>icis-bom</artifactId>
+	<version>dev</version>
+	<name>icis-bom</name>
+	<description>ICIS TR Top Module</description>
+	
+	<packaging>pom</packaging>
+	
+	<properties>
+		<java.version>17</java.version>
+		<airport-core.version>2.0.0.4</airport-core.version>
+  		<airport-common.version>2.0.0.4</airport-common.version>
+	</properties>
+	
+	<dependencyManagement>
+		<dependencies>
+			
+			<dependency>
+			  <groupId>com.ssongman.airport</groupId>
+			  <artifactId>airport-core</artifactId>
+				<version>[2.0.0.0,)</version>
+			</dependency>
+			
+			<dependency>
+			  <groupId>com.ssongman.airport</groupId>
+			  <artifactId>airport-common</artifactId>
+				<version>[1.0.0.0,)</version>
+			</dependency>			
+	
+		</dependencies>
+	</dependencyManagement>	
+    
+    
+	<!-- 라이브러리가 업로드된 Nexus Repository 정보 -->
+	<repositories>
+	  <repository>
+	      <id>ssongman-repo</id>
+	      <name>ssongman nexus repository</name>
+	      <url>http://nexus.ssongman.duckdns.org/repository/ssongman-repo/</url>
+	  </repository>
+	</repositories>
+
+</project>
+
+```
+
+
+
+versions:resolve-ranges 수행하여 max version 을 할당한 후 local repo 에 install 한다.
+
+```sh
+
+$ mvn versions:resolve-ranges
+$ mvn clean install
+
+# commit & push 를 하지 않는다.
+
+
+
+
+# commit - versionsBackup 삭제된다.
+$ mvn versions:commit
+
+# rollback - versionsBackup 파일로 원복후 파일은 삭제된다.
+$ mvn versions:revert
+
+```
+
+
+
+
+
+## 4) main AP
+
+icis-bom 을 parent 로 받는다.
+
+module 들의 버젼은 bom 프로젝트에서 명시된 버젼들로 override 된다.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+		<groupId>com.ssongman.airport</groupId>
+		<artifactId>airport-bom</artifactId>
+		<version>dev</version>
+	</parent>
+	
+	<artifactId>airport-api</artifactId>
+    <version>${revision}</version>
+	<name>airport-api</name>
+	<description>Spring Boot Multi-Module Project(Maven)</description>
+	
+	<properties>
+		<java.version>17</java.version>
+  		<revision>0.0.2.0</revision>
+	</properties>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+		
+		<dependency>
+		  <groupId>com.ssongman.airport</groupId>
+		  <artifactId>airport-core</artifactId>
+		</dependency>
+			
+		<dependency>
+		  <groupId>com.ssongman.airport</groupId>
+		  <artifactId>airport-common</artifactId>
+		</dependency>
+
+	</dependencies>
+	
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			
+			<!-- To use the plugin goals in your POM or parent POM -->
+	        <plugin>
+	          <groupId>org.codehaus.mojo</groupId>
+	          <artifactId>versions-maven-plugin</artifactId>
+	        </plugin>
+        
+		</plugins>
+	</build>
+
+</project>
+
+```
+
+
+
+
+
+```sh
+$ mvn -Drevision=2.0.0.5 -DskipTests clean install -U
+$ mvn -Drevision=2.0.0.6 -DskipTests clean install -U
+
+```
+
+
 
 
 
