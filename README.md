@@ -255,6 +255,27 @@ mvn -Drevision=1.0.9.4 -DskipTests clean compile deploy
 
 
 
+```
+
+
+1.0.1.0
+1.0.9.3
+1.0.10.1
+1.0.10.2
+
+1.0.1-0
+1.0.9-3
+1.0.10-1
+1.0.10-2
+1.0.10-Snapshot
+
+1.0.10-Beta1
+1.0.10-Beta2
+1.0.10
+
+
+```
+
 
 
 
@@ -853,9 +874,9 @@ mvn -X -Drevision=0.0.2.6 -DskipTests clean install -U
 
 
 
-# 4. flattern
+# 4. flattern 
 
-
+관련링크 : https://www.mojohaus.org/flatten-maven-plugin/examples/example-multiple-versions.html
 
 
 
@@ -1207,7 +1228,7 @@ $ mvn -Drevision=2.0.0.6 -DskipTests clean install -U
 
 module 들을 version range 로 선언하여 최신버젼을 가져오거나
 
-사용자가 지절할 수 있도록 한다.
+사용자가 지정할 수 있도록 한다.
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
