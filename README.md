@@ -308,7 +308,6 @@ pom.xml에 아래와 같은 설정을 추가한다.
 		  <artifactId>airport-core</artifactId>
 		  <version>0.0.7</version>
 		</dependency>
-
 ...
 
 
